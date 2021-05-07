@@ -1,29 +1,19 @@
 package main
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"fmt"
 )
 
-type Block struct {
-	PrevHash []byte
-	Hash     []byte
-	Data     []byte
-}
-
-func (b *Block) DeriveHash() {
-	prevInfo := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
-	hashed := sha256.Sum256(prevInfo)
-	b.Hash = hashed
-}
-
-func CreateBlock(data string, prevHash []byte) *Block {
-	block := &Block{[]byte{}, []byte(data, prevHash)}
-	block.DeriveHash()
-	return block
-}
-
 func main() {
-	fmt.Println("hello world")
+	chain := blockchain.InitBlockchain()
+	chain.AddBlockToChain("First block after Init")
+	chain.AddBlockToChain("Second block after Init")
+	chain.AddBlockToChain("Third block after Init")
+	chain.AddBlockToChain("Fourth block after Init")
+
+	for _, block := range chain.blocks {
+		fmt.Printf("Prev hash: %x\n", block.PrevHash)
+		fmt.Printf("data in block: %s\n", block.Data)
+		fmt.Printf("hash: %x \n", block.Hash)
+	}
 }
