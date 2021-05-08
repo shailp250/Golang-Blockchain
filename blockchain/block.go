@@ -1,29 +1,32 @@
 package blockchain
 
-import (
-	"bytes"
-	"crypto/sha256"
-)
-
 type Block struct {
 	Hash     []byte
 	Data     []byte
 	PrevHash []byte
+	Nonce    int
 }
 
 type BlockChain struct {
 	Blocks []*Block
 }
 
+/* Already in proof-of-work Algo in "proof.go"
+
 func (b *Block) DeriveHash() {
 	prevInfo := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
 	hashed := sha256.Sum256(prevInfo)
 	b.Hash = hashed[:]
 }
-
+*/
 func CreateBlock(data string, prevHash []byte) *Block {
-	block := &Block{[]byte{}, []byte(data), prevHash}
-	block.DeriveHash()
+	block := &Block{[]byte{}, []byte(data), prevHash, 0}
+	pow := NewProof(block)
+	nonce, hash := pow.Run()
+
+	block.Hash = hash[:]
+	block.Nonce = nonce
+	//block.DeriveHash()
 	return block
 }
 
