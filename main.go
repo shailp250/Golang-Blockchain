@@ -9,10 +9,9 @@ import (
 
 func main() {
 	chain := blockchain.InitBlockchain()
-	chain.AddBlockToChain("First block after Init")
-	chain.AddBlockToChain("Second block after Init")
-	chain.AddBlockToChain("Third block after Init")
-	chain.AddBlockToChain("Fourth block after Init")
+	chain.AddBlock("First Block after Genesis")
+	chain.AddBlock("Second Block after Genesis")
+	chain.AddBlock("Third Block after Genesis")
 
 	for _, block := range chain.Blocks {
 		fmt.Printf("Prev hash: %x\n", block.PrevHash)

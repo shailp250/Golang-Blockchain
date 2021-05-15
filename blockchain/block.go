@@ -1,5 +1,11 @@
 package blockchain
 
+import (
+	"bytes"
+	"encoding/gob"
+	"log"
+)
+
 type Block struct {
 	Hash     []byte
 	Data     []byte
@@ -7,12 +13,7 @@ type Block struct {
 	Nonce    int
 }
 
-type BlockChain struct {
-	Blocks []*Block
-}
-
 /* Already in proof-of-work Algo in "proof.go"
-
 func (b *Block) DeriveHash() {
 	prevInfo := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
 	hashed := sha256.Sum256(prevInfo)
@@ -30,16 +31,34 @@ func CreateBlock(data string, prevHash []byte) *Block {
 	return block
 }
 
-func (chain *BlockChain) AddBlockToChain(data string) {
-	prevBlock := chain.Blocks[len(chain.Blocks)-1]
-	new := CreateBlock(data, prevBlock.Hash)
-	chain.Blocks = append(chain.Blocks, new)
-}
-
 func InitBlock() *Block {
 	return CreateBlock("Prime", []byte{})
 }
 
-func InitBlockchain() *BlockChain {
-	return &BlockChain{[]*Block{InitBlock()}}
+// badger db only accepts arrays of bytes so you need to serialize and deserialize
+func (b *Block) Serialize() []byte {
+	var res bytes.Buffer
+	encoder := gob.NewEncoder(&res)
+
+	err := encoder.Encode(b)
+	Handle(err)
+
+	return res.Bytes()
+}
+
+func Deserialize(data []byte) *Block {
+	var block Block
+
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+
+	err := decoder.Decode(&block)
+	Handle(err)
+	return &block
+
+}
+
+func Handle(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
 }
